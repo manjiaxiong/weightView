@@ -33,5 +33,72 @@ button {
 
 .app-shell {
   min-height: 100vh;
+  padding: 0;
+}
+
+.app-shell.centered {
+  display: grid;
+  place-items: center;
   padding: 24px;
+}
+
+.app-content {
+  width: min(100%, 720px);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 24px 20px 96px;
+}
+
+.page {
+  display: grid;
+  gap: 12px;
+}
+
+.page h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  line-height: 1.15;
+}
+
+.page p {
+  margin: 0;
+  color: #52616b;
+}
+
+.bottom-nav {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  border-top: 1px solid #d9e2dc;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 -8px 24px rgba(31, 41, 51, 0.08);
+}
+
+.bottom-nav button {
+  min-height: 48px;
+  padding: 8px 6px;
+  border: 0;
+  border-radius: 8px;
+  color: #52616b;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.bottom-nav button.active {
+  color: #102a43;
+  background: #e3f3ec;
+}
+
+@media (min-width: 760px) {
+  .app-content {
+    padding: 40px 32px 112px;
+  }
 }
