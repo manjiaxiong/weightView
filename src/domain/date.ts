@@ -1,7 +1,8 @@
-import { addDays, differenceInCalendarDays, endOfMonth, format, parseISO, startOfMonth, startOfWeek } from 'date-fns'
+import { addDays, differenceInCalendarDays, endOfMonth, format, isValid, parseISO, startOfMonth, startOfWeek } from 'date-fns'
 import type { CalendarDay, IsoDate } from './types'
 
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
+const INVALID_ISO_DATE_ERROR = 'Expected a valid date in YYYY-MM-DD format'
 
 export function normalizeIsoDate(value: Date | string): IsoDate {
   if (value instanceof Date) {
@@ -9,7 +10,12 @@ export function normalizeIsoDate(value: Date | string): IsoDate {
   }
 
   if (!ISO_DATE_PATTERN.test(value)) {
-    throw new Error('Expected date in YYYY-MM-DD format')
+    throw new Error(INVALID_ISO_DATE_ERROR)
+  }
+
+  const parsed = parseISO(value)
+  if (!isValid(parsed) || format(parsed, 'yyyy-MM-dd') !== value) {
+    throw new Error(INVALID_ISO_DATE_ERROR)
   }
 
   return value

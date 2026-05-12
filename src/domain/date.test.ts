@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  compareIsoDateAsc,
   compareIsoDateDesc,
   daysBetween,
   getCalendarMonth,
@@ -17,7 +18,13 @@ describe('date domain utilities', () => {
   })
 
   it('rejects malformed date strings', () => {
-    expect(() => normalizeIsoDate('2026-5-2')).toThrow('Expected date in YYYY-MM-DD format')
+    expect(() => normalizeIsoDate('2026-5-2')).toThrow('Expected a valid date in YYYY-MM-DD format')
+  })
+
+  it('rejects ISO-looking invalid calendar dates', () => {
+    expect(() => normalizeIsoDate('2026-02-31')).toThrow('Expected a valid date in YYYY-MM-DD format')
+    expect(() => normalizeIsoDate('2026-13-01')).toThrow('Expected a valid date in YYYY-MM-DD format')
+    expect(() => normalizeIsoDate('2026-00-10')).toThrow('Expected a valid date in YYYY-MM-DD format')
   })
 
   it('sorts ISO dates in descending order', () => {
@@ -25,6 +32,14 @@ describe('date domain utilities', () => {
       '2026-05-12',
       '2026-05-10',
       '2026-05-01'
+    ])
+  })
+
+  it('sorts ISO dates in ascending order', () => {
+    expect(['2026-05-10', '2026-05-12', '2026-05-01'].sort(compareIsoDateAsc)).toEqual([
+      '2026-05-01',
+      '2026-05-10',
+      '2026-05-12'
     ])
   })
 
