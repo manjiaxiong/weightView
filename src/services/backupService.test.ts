@@ -48,10 +48,12 @@ describe('backupService', () => {
     )
   })
 
-  it('rejects invalid exportedAt backup metadata', () => {
-    expect(() => importBackupJson(createEmptyAppData(), JSON.stringify({ exportedAt: 'not-a-date', data: createEmptyAppData() }))).toThrow(
-      'Backup file is not a valid Weight View backup'
-    )
+  it('rejects non-iso exportedAt backup metadata', () => {
+    for (const exportedAt of ['not-a-date', '123', '2026-05-12', 'May 12, 2026']) {
+      expect(() => importBackupJson(createEmptyAppData(), JSON.stringify({ exportedAt, data: createEmptyAppData() }))).toThrow(
+        'Backup file is not a valid Weight View backup'
+      )
+    }
   })
 
   it('rejects empty backup app data envelope', () => {

@@ -3,6 +3,8 @@ import { sortWeightRecords } from '../domain/weight'
 import type { AppData, InjectionRecord, WeightRecord } from '../domain/types'
 import { migrateAppData } from './migrationService'
 
+const ISO_DATE_TIME_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+
 export type BackupPayload = {
   exportedAt: string
   data: AppData
@@ -57,7 +59,7 @@ function isValidBackupPayload(value: unknown): value is BackupPayload {
 }
 
 function isValidExportedAt(value: unknown): value is string {
-  return typeof value === 'string' && value.trim().length > 0 && !Number.isNaN(Date.parse(value))
+  return typeof value === 'string' && ISO_DATE_TIME_PATTERN.test(value) && new Date(value).toISOString() === value
 }
 
 function isValidBackupDataEnvelope(value: unknown): value is AppData {
