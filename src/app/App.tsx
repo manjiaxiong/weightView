@@ -22,6 +22,11 @@ export function App() {
   return (
     <main className="app-shell">
       <div className="app-content">
+        {appData.saveError && (
+          <p className="app-save-error" role="alert">
+            {appData.saveError}
+          </p>
+        )}
         {tab === 'home' && <HomePage appData={appData} />}
         {tab === 'calendar' && <CalendarPage appData={appData} />}
         {tab === 'records' && <RecordsPage appData={appData} />}

@@ -34,6 +34,7 @@ export function useAppData() {
   const [data, setData] = useState<AppData | null>(null)
   const [loadState, setLoadState] = useState<LoadState>('loading')
   const [error, setError] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const dataRef = useRef<AppData | null>(null)
   const persistQueueRef = useRef(Promise.resolve())
 
@@ -66,7 +67,7 @@ export function useAppData() {
   const persistNextData = useCallback(async (nextData: AppData) => {
     dataRef.current = nextData
     setData(nextData)
-    setError(null)
+    setSaveError(null)
 
     const persistTask = persistQueueRef.current
       .catch(() => undefined)
@@ -77,8 +78,7 @@ export function useAppData() {
     try {
       await persistTask
     } catch (persistError) {
-      setError(getErrorMessage(persistError))
-      setLoadState('error')
+      setSaveError('Unable to save app data')
       throw persistError
     }
   }, [])
@@ -138,6 +138,7 @@ export function useAppData() {
     data,
     loadState,
     error,
+    saveError,
     weights: data?.records.weights ?? ([] as WeightRecord[]),
     injections: data?.records.injections ?? ([] as InjectionRecord[]),
     actions
