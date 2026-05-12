@@ -48,6 +48,18 @@ describe('backupService', () => {
     )
   })
 
+  it('rejects invalid exportedAt backup metadata', () => {
+    expect(() => importBackupJson(createEmptyAppData(), JSON.stringify({ exportedAt: 'not-a-date', data: createEmptyAppData() }))).toThrow(
+      'Backup file is not a valid Weight View backup'
+    )
+  })
+
+  it('rejects empty backup app data envelope', () => {
+    const json = JSON.stringify({ exportedAt: '2026-05-12T00:00:00.000Z', data: {} })
+
+    expect(() => importBackupJson(createEmptyAppData(), json)).toThrow('Backup file is not a valid Weight View backup')
+  })
+
   it('rejects invalid imported weight data without overwriting local records', () => {
     const local = createEmptyAppData()
     local.records.weights.push({ id: 'local', date: '2026-05-12', weight: 81, createdAt: 'a', updatedAt: 'b' })

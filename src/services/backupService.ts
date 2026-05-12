@@ -51,11 +51,31 @@ function isValidBackupPayload(value: unknown): value is BackupPayload {
 
   const payload = value as Partial<BackupPayload>
   return (
-    typeof payload.exportedAt === 'string' &&
-    payload.exportedAt.trim().length > 0 &&
-    !!payload.data &&
-    typeof payload.data === 'object' &&
-    !Array.isArray(payload.data)
+    isValidExportedAt(payload.exportedAt) &&
+    isValidBackupDataEnvelope(payload.data)
+  )
+}
+
+function isValidExportedAt(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0 && !Number.isNaN(Date.parse(value))
+}
+
+function isValidBackupDataEnvelope(value: unknown): value is AppData {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return false
+  }
+
+  const data = value as Partial<AppData>
+  return (
+    typeof data.schemaVersion === 'number' &&
+    !!data.records &&
+    typeof data.records === 'object' &&
+    !Array.isArray(data.records) &&
+    Array.isArray(data.records.weights) &&
+    Array.isArray(data.records.injections) &&
+    !!data.settings &&
+    typeof data.settings === 'object' &&
+    !Array.isArray(data.settings)
   )
 }
 
