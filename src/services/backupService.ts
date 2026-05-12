@@ -27,8 +27,11 @@ export function importBackupJson(current: AppData, json: string): AppData {
     throw new Error('Backup file is not valid JSON')
   }
 
-  const payload = parsed as Partial<BackupPayload>
-  const imported = migrateAppData(payload.data)
+  if (!isValidBackupPayload(parsed)) {
+    throw new Error('Backup file is not a valid Weight View backup')
+  }
+
+  const imported = migrateAppData(parsed.data, { strictRecords: true })
 
   return {
     ...current,
@@ -39,6 +42,21 @@ export function importBackupJson(current: AppData, json: string): AppData {
     },
     settings: imported.settings
   }
+}
+
+function isValidBackupPayload(value: unknown): value is BackupPayload {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return false
+  }
+
+  const payload = value as Partial<BackupPayload>
+  return (
+    typeof payload.exportedAt === 'string' &&
+    payload.exportedAt.trim().length > 0 &&
+    !!payload.data &&
+    typeof payload.data === 'object' &&
+    !Array.isArray(payload.data)
+  )
 }
 
 function mergeByDate<T extends WeightRecord | InjectionRecord>(

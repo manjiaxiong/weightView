@@ -32,4 +32,21 @@ describe('migrationService', () => {
   it('rejects unsupported future schema versions', () => {
     expect(() => migrateAppData({ schemaVersion: 99 })).toThrow('Unsupported data schema version: 99')
   })
+
+  it('filters malformed stored records during migration', () => {
+    const migrated = migrateAppData({
+      schemaVersion: 1,
+      records: {
+        weights: [
+          { id: 'valid', date: '2026-05-12', weight: 80, createdAt: 'a', updatedAt: 'b' },
+          { id: 'invalid', date: '2026-05-13', weight: -1, createdAt: 'c', updatedAt: 'd' }
+        ],
+        injections: [{ id: 'bad-injection', date: '2026-05-12', medicineName: '', createdAt: 'a', updatedAt: 'b' }]
+      },
+      settings: { unit: 'kg' }
+    })
+
+    expect(migrated.records.weights).toEqual([{ id: 'valid', date: '2026-05-12', weight: 80, createdAt: 'a', updatedAt: 'b' }])
+    expect(migrated.records.injections).toEqual([])
+  })
 })
