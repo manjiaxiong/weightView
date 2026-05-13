@@ -64,7 +64,12 @@ export function InjectionEntrySheet({ open, record, initialDate, onClose, onSave
   }
 
   return (
-    <EntrySheet title={record ? 'Edit injection' : 'Add injection'} open={open} onClose={onClose}>
+    <EntrySheet
+      title={record ? 'Edit injection' : 'Add injection'}
+      open={open}
+      closeDisabled={isSaving}
+      onClose={onClose}
+    >
       <form className="sheet-form" onSubmit={handleSubmit}>
         <label>
           Date

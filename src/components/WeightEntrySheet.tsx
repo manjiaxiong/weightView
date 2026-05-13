@@ -63,7 +63,7 @@ export function WeightEntrySheet({ open, record, initialDate, onClose, onSave }:
   }
 
   return (
-    <EntrySheet title={record ? 'Edit weight' : 'Add weight'} open={open} onClose={onClose}>
+    <EntrySheet title={record ? 'Edit weight' : 'Add weight'} open={open} closeDisabled={isSaving} onClose={onClose}>
       <form className="sheet-form" onSubmit={handleSubmit}>
         <label>
           Date
