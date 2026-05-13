@@ -17,7 +17,7 @@ type MigrationOptions = {
   strictRecords?: boolean
 }
 
-const INVALID_RECORD_DATA_ERROR = 'Backup contains invalid record data'
+const INVALID_RECORD_DATA_ERROR = '备份数据包含无效记录'
 
 export function createEmptyAppData(): AppData {
   return {
@@ -40,7 +40,7 @@ export function migrateAppData(raw: unknown, options: MigrationOptions = {}): Ap
 
   const data = raw as UnknownData
   if (data.schemaVersion && data.schemaVersion > CURRENT_SCHEMA_VERSION) {
-    throw new Error(`Unsupported data schema version: ${data.schemaVersion}`)
+    throw new Error(`不支持的数据版本：${data.schemaVersion}`)
   }
 
   return {
@@ -51,9 +51,14 @@ export function migrateAppData(raw: unknown, options: MigrationOptions = {}): Ap
     },
     settings: {
       unit: 'kg',
-      defaultMedicineName: data.settings?.defaultMedicineName || DEFAULT_MEDICINE_NAME
+      defaultMedicineName: data.settings?.defaultMedicineName || DEFAULT_MEDICINE_NAME,
+      targetWeight: readTargetWeight(data.settings?.targetWeight)
     }
   }
+}
+
+function readTargetWeight(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : undefined
 }
 
 function readValidWeightRecords(value: unknown, strict: boolean): WeightRecord[] {

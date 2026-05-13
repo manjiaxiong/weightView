@@ -9,10 +9,10 @@ describe('WeightEntrySheet', () => {
     const onSave = vi.fn()
     render(<WeightEntrySheet open initialDate="2026-05-13" onClose={vi.fn()} onSave={onSave} />)
 
-    fireEvent.change(screen.getByLabelText('Weight (kg)'), { target: { value: '0' } })
-    fireEvent.submit(screen.getByRole('button', { name: 'Save weight' }).closest('form')!)
+    fireEvent.change(screen.getByLabelText('体重 (kg)'), { target: { value: '0' } })
+    fireEvent.submit(screen.getByRole('button', { name: '保存体重' }).closest('form')!)
 
-    expect(screen.getByRole('alert')).toHaveTextContent('Enter a weight greater than 0 kg.')
+    expect(screen.getByRole('alert')).toHaveTextContent('请输入大于 0 的体重')
     expect(onSave).not.toHaveBeenCalled()
   })
 
@@ -44,16 +44,16 @@ describe('WeightEntrySheet', () => {
 
     render(<Harness />)
 
-    fireEvent.change(screen.getByLabelText('Weight (kg)'), { target: { value: '0' } })
-    fireEvent.submit(screen.getByRole('button', { name: 'Save weight' }).closest('form')!)
+    fireEvent.change(screen.getByLabelText('体重 (kg)'), { target: { value: '0' } })
+    fireEvent.submit(screen.getByRole('button', { name: '保存体重' }).closest('form')!)
     expect(screen.getByRole('alert')).toBeVisible()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    fireEvent.click(screen.getByRole('button', { name: '关闭' }))
     fireEvent.click(screen.getByRole('button', { name: 'Reopen' }))
 
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-    expect(screen.getByLabelText('Date')).toHaveValue('2026-05-14')
-    expect(screen.getByLabelText('Weight (kg)')).toHaveValue(null)
+    expect(screen.getByLabelText('日期')).toHaveValue('2026-05-14')
+    expect(screen.getByLabelText('体重 (kg)')).toHaveValue(null)
   })
 
   it('keeps the sheet open and shows an inline error when async save fails', async () => {
@@ -64,11 +64,11 @@ describe('WeightEntrySheet', () => {
 
     render(<WeightEntrySheet open initialDate="2026-05-13" onClose={onClose} onSave={onSave} />)
 
-    fireEvent.change(screen.getByLabelText('Weight (kg)'), { target: { value: '82.4' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Save weight' }))
+    fireEvent.change(screen.getByLabelText('体重 (kg)'), { target: { value: '82.4' } })
+    fireEvent.click(screen.getByRole('button', { name: '保存体重' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Scale service rejected the entry.')
-    expect(screen.getByRole('dialog', { name: 'Add weight' })).toBeVisible()
+    expect(screen.getByRole('dialog', { name: '添加体重' })).toBeVisible()
     expect(onClose).not.toHaveBeenCalled()
   })
 
@@ -84,12 +84,12 @@ describe('WeightEntrySheet', () => {
 
     render(<WeightEntrySheet open initialDate="2026-05-13" onClose={onClose} onSave={onSave} />)
 
-    fireEvent.change(screen.getByLabelText('Weight (kg)'), { target: { value: '82.4' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Save weight' }))
+    fireEvent.change(screen.getByLabelText('体重 (kg)'), { target: { value: '82.4' } })
+    fireEvent.click(screen.getByRole('button', { name: '保存体重' }))
 
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Close' })).toBeDisabled())
+    await waitFor(() => expect(screen.getByRole('button', { name: '关闭' })).toBeDisabled())
 
-    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    fireEvent.click(screen.getByRole('button', { name: '关闭' }))
     fireEvent.click(screen.getByRole('presentation'))
     fireEvent.keyDown(document, { key: 'Escape' })
 

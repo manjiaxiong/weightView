@@ -29,8 +29,30 @@ describe('migrationService', () => {
     expect(migrated.settings.defaultMedicineName).toBe('Tirzepatide')
   })
 
+  it('preserves valid target weight settings', () => {
+    const migrated = migrateAppData({
+      schemaVersion: 1,
+      records: { weights: [], injections: [] },
+      settings: { unit: 'kg', defaultMedicineName: 'Tirzepatide', targetWeight: 70 }
+    })
+
+    expect(migrated.settings.targetWeight).toBe(70)
+  })
+
+  it('ignores invalid target weight settings', () => {
+    for (const targetWeight of [0, -1, Number.NaN, '70']) {
+      const migrated = migrateAppData({
+        schemaVersion: 1,
+        records: { weights: [], injections: [] },
+        settings: { unit: 'kg', defaultMedicineName: 'Tirzepatide', targetWeight }
+      })
+
+      expect(migrated.settings.targetWeight).toBeUndefined()
+    }
+  })
+
   it('rejects unsupported future schema versions', () => {
-    expect(() => migrateAppData({ schemaVersion: 99 })).toThrow('Unsupported data schema version: 99')
+    expect(() => migrateAppData({ schemaVersion: 99 })).toThrow('不支持的数据版本：99')
   })
 
   it('filters malformed stored records during migration', () => {

@@ -8,6 +8,7 @@ import { HomePage } from './HomePage'
 vi.mock('recharts', () => ({
   LineChart: ({ children }: { children: React.ReactNode }) => <div data-testid="line-chart">{children}</div>,
   Line: () => <div data-testid="line" />,
+  ReferenceLine: () => <div data-testid="ref-line" />,
   ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Tooltip: () => <div data-testid="tooltip" />,
   XAxis: () => <div data-testid="x-axis" />,
@@ -40,6 +41,7 @@ function createAppData(
       removeWeight: vi.fn(async () => undefined),
       saveInjection: vi.fn(async () => undefined),
       removeInjection: vi.fn(async () => undefined),
+      saveSettings: vi.fn(async () => undefined),
       replaceData: vi.fn(async () => undefined)
     },
     ...overrides
@@ -54,12 +56,12 @@ describe('HomePage', () => {
   it('renders dashboard values and a clean empty state when no records exist', () => {
     render(<HomePage appData={createAppData()} />)
 
-    expect(screen.getByRole('heading', { name: 'Home' })).toBeVisible()
-    expect(screen.getByText('Latest weight')).toBeVisible()
-    expect(screen.getAllByText('--')).toHaveLength(4)
-    expect(screen.getByText('No weight records yet.')).toBeVisible()
-    expect(screen.getByRole('button', { name: 'Add weight' })).toBeVisible()
-    expect(screen.getByRole('button', { name: 'Add injection' })).toBeVisible()
+    expect(screen.getByRole('heading', { name: '首页' })).toBeVisible()
+    expect(screen.getByText('最新体重')).toBeVisible()
+    expect(screen.getAllByText('--')).toHaveLength(5)
+    expect(screen.getByText('暂无体重记录')).toBeVisible()
+    expect(screen.getByRole('button', { name: '添加体重' })).toBeVisible()
+    expect(screen.getByRole('button', { name: '添加注射' })).toBeVisible()
   })
 
   it('renders latest metrics from unsorted records', () => {
@@ -81,8 +83,31 @@ describe('HomePage', () => {
 
     expect(screen.getByText('80.0 kg')).toBeVisible()
     expect(screen.getByText('-1.0 kg')).toBeVisible()
+    expect(screen.getByText('较初始减少')).toBeVisible()
+    expect(screen.getByText('2.0 kg')).toBeVisible()
     expect(screen.getByText('2026-05-10')).toBeVisible()
-    expect(screen.getByText('3 days')).toBeVisible()
+    expect(screen.getByText('3 天')).toBeVisible()
+  })
+
+  it('renders target weight progress when a target is set', () => {
+    render(
+      <HomePage
+        appData={createAppData({
+          data: {
+            schemaVersion: 1,
+            records: { weights: [], injections: [] },
+            settings: { unit: 'kg', defaultMedicineName: 'Tirzepatide', targetWeight: 78 }
+          },
+          weights: [
+            { ...baseWeight, id: 'weight-2026-05-01', date: '2026-05-01', weight: 82 },
+            { ...baseWeight, id: 'weight-2026-05-12', date: '2026-05-12', weight: 80 }
+          ]
+        })}
+      />
+    )
+
+    expect(screen.getByRole('heading', { name: '78.0 kg' })).toBeVisible()
+    expect(screen.getByText('距目标还差 2.0 kg')).toBeVisible()
   })
 
   it('opens entry sheets and saves through app data actions', async () => {
@@ -101,19 +126,19 @@ describe('HomePage', () => {
       />
     )
 
-    fireEvent.click(screen.getByRole('button', { name: 'Add weight' }))
-    expect(screen.getByRole('dialog', { name: 'Add weight' })).toBeVisible()
-    fireEvent.change(screen.getByLabelText('Weight (kg)'), { target: { value: '79.5' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Save weight' }))
+    fireEvent.click(screen.getByRole('button', { name: '添加体重' }))
+    expect(screen.getByRole('dialog', { name: '添加体重' })).toBeVisible()
+    fireEvent.change(screen.getByLabelText('体重 (kg)'), { target: { value: '79.5' } })
+    fireEvent.click(screen.getByRole('button', { name: '保存体重' }))
 
     await waitFor(() =>
       expect(saveWeight).toHaveBeenCalledWith({ date: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/), weight: 79.5 })
     )
 
-    fireEvent.click(screen.getByRole('button', { name: 'Add injection' }))
-    expect(screen.getByRole('dialog', { name: 'Add injection' })).toBeVisible()
-    fireEvent.change(screen.getByLabelText('Dose'), { target: { value: '2.5 mg' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Save injection' }))
+    fireEvent.click(screen.getByRole('button', { name: '添加注射' }))
+    expect(screen.getByRole('dialog', { name: '添加注射' })).toBeVisible()
+    fireEvent.change(screen.getByLabelText('剂量'), { target: { value: '2.5 mg' } })
+    fireEvent.click(screen.getByRole('button', { name: '保存注射记录' }))
 
     await waitFor(() =>
       expect(saveInjection).toHaveBeenCalledWith({

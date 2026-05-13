@@ -21,20 +21,20 @@ import { App } from './App'
 it('renders the loaded home page', async () => {
   render(<App />)
 
-  expect(await screen.findByRole('heading', { name: 'Home' })).toBeVisible()
+  expect(await screen.findByRole('heading', { name: '首页' })).toBeVisible()
 })
 
 it('switches between bottom navigation tabs', async () => {
   render(<App />)
 
-  expect(await screen.findByRole('heading', { name: 'Home' })).toBeVisible()
+  expect(await screen.findByRole('heading', { name: '首页' })).toBeVisible()
 
-  fireEvent.click(screen.getByRole('button', { name: 'Calendar' }))
-  expect(screen.getByRole('heading', { name: 'Calendar' })).toBeVisible()
+  fireEvent.click(screen.getByRole('button', { name: '日历' }))
+  expect(screen.getByRole('heading', { level: 1 })).toBeVisible()
 
-  fireEvent.click(screen.getByRole('button', { name: 'Records' }))
-  expect(screen.getByRole('heading', { name: 'Records' })).toBeVisible()
+  fireEvent.click(screen.getByRole('button', { name: '记录' }))
+  expect(screen.getByRole('heading', { name: '记录' })).toBeVisible()
 
-  fireEvent.click(screen.getByRole('button', { name: 'Settings' }))
-  expect(screen.getByRole('heading', { name: 'Settings' })).toBeVisible()
+  fireEvent.click(screen.getByRole('button', { name: '设置' }))
+  expect(screen.getByRole('heading', { name: '设置' })).toBeVisible()
 })

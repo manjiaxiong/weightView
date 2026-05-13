@@ -18,13 +18,13 @@ describe('date domain utilities', () => {
   })
 
   it('rejects malformed date strings', () => {
-    expect(() => normalizeIsoDate('2026-5-2')).toThrow('Expected a valid date in YYYY-MM-DD format')
+    expect(() => normalizeIsoDate('2026-5-2')).toThrow('请输入有效的日期，格式为 YYYY-MM-DD')
   })
 
   it('rejects ISO-looking invalid calendar dates', () => {
-    expect(() => normalizeIsoDate('2026-02-31')).toThrow('Expected a valid date in YYYY-MM-DD format')
-    expect(() => normalizeIsoDate('2026-13-01')).toThrow('Expected a valid date in YYYY-MM-DD format')
-    expect(() => normalizeIsoDate('2026-00-10')).toThrow('Expected a valid date in YYYY-MM-DD format')
+    expect(() => normalizeIsoDate('2026-02-31')).toThrow('请输入有效的日期，格式为 YYYY-MM-DD')
+    expect(() => normalizeIsoDate('2026-13-01')).toThrow('请输入有效的日期，格式为 YYYY-MM-DD')
+    expect(() => normalizeIsoDate('2026-00-10')).toThrow('请输入有效的日期，格式为 YYYY-MM-DD')
   })
 
   it('sorts ISO dates in descending order', () => {

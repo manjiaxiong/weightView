@@ -45,7 +45,7 @@ export function WeightEntrySheet({ open, record, initialDate, onClose, onSave }:
 
     const nextWeight = Number(weight)
     if (!Number.isFinite(nextWeight) || nextWeight <= 0) {
-      setError('Enter a weight greater than 0 kg.')
+      setError('请输入大于 0 的体重')
       return
     }
 
@@ -56,22 +56,22 @@ export function WeightEntrySheet({ open, record, initialDate, onClose, onSave }:
       await onSave({ date, weight: nextWeight })
       onClose()
     } catch (saveError) {
-      setError(getErrorMessage(saveError, 'Unable to save weight.'))
+      setError(getErrorMessage(saveError, '保存体重失败'))
     } finally {
       setIsSaving(false)
     }
   }
 
   return (
-    <EntrySheet title={record ? 'Edit weight' : 'Add weight'} open={open} closeDisabled={isSaving} onClose={onClose}>
+    <EntrySheet title={record ? '编辑体重' : '添加体重'} open={open} closeDisabled={isSaving} onClose={onClose}>
       <form className="sheet-form" onSubmit={handleSubmit}>
         <label>
-          Date
+          日期
           <input type="date" value={date} required onChange={(event) => setDate(event.target.value)} />
         </label>
 
         <label>
-          Weight (kg)
+          体重 (kg)
           <input
             type="number"
             value={weight}
@@ -91,7 +91,7 @@ export function WeightEntrySheet({ open, record, initialDate, onClose, onSave }:
         )}
 
         <button className="primary-button" type="submit" disabled={isSaving}>
-          {isSaving ? 'Saving...' : 'Save weight'}
+          {isSaving ? '保存中...' : '保存体重'}
         </button>
       </form>
     </EntrySheet>

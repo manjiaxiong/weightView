@@ -6,10 +6,10 @@ type BottomNavProps = {
 }
 
 const tabs: Array<{ id: AppTab; label: string }> = [
-  { id: 'home', label: 'Home' },
-  { id: 'calendar', label: 'Calendar' },
-  { id: 'records', label: 'Records' },
-  { id: 'settings', label: 'Settings' }
+  { id: 'home', label: '首页' },
+  { id: 'calendar', label: '日历' },
+  { id: 'records', label: '记录' },
+  { id: 'settings', label: '设置' }
 ]
 
 export function BottomNav({ activeTab, onChange }: BottomNavProps) {

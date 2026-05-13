@@ -1,9 +1,9 @@
 # Weight Management App Handoff
 
-Date: 2026-05-12
+Date: 2026-05-13
 Workspace: `D:\code\weightView`
 Current branch: `master`
-Current HEAD: `b984ab5 feat: add entry sheets`
+Current HEAD before this handoff edit: `008ee89 feat: add home dashboard`
 
 ## Purpose
 
@@ -16,7 +16,7 @@ The app is an offline Android-first weight and injection tracker built with Reac
 - Design spec: `docs/superpowers/specs/2026-05-12-weight-management-app-design.md`
 - Implementation plan: `docs/superpowers/plans/2026-05-12-weight-management-app.md`
 
-These docs are currently untracked by git. The app code commits are tracked.
+These docs are tracked in git. This handoff update may be uncommitted until the next checkpoint.
 
 ## User Requirements
 
@@ -29,6 +29,81 @@ These docs are currently untracked by git. The app code commits are tracked.
 - Track injection records for Tirzepatide: date + medicine name + optional dose.
 - No injection reminders in v1.
 - Show both trend chart and calendar view.
+
+## 2026-05-13 Review Checkpoint
+
+The user said another model finished the later code and asked for a review. Current working tree contains uncommitted Task 8-10 style implementation work plus this handoff edit.
+
+Implemented by the other model before this review:
+
+- Task 8 Calendar:
+  - Added `src/components/MonthCalendar.tsx`.
+  - Replaced `src/pages/CalendarPage.tsx` with month navigation, date selection, and add/edit weight/injection sheet entry for the selected date.
+  - Added calendar CSS in `src/styles/global.css`.
+- Task 9 Records and Settings:
+  - Replaced `src/pages/RecordsPage.tsx` with a combined reverse chronological weight/injection list and delete buttons.
+  - Replaced `src/pages/SettingsPage.tsx` with JSON import/export UI.
+  - Added records/settings CSS.
+- Task 10 Android packaging:
+  - Added `capacitor.config.ts`.
+  - Added generated `android/` project.
+  - Added `docs/android-release.md`.
+  - Added Capacitor scripts in `package.json`.
+
+Review fixes made in this session:
+
+- Added Android-native backup export support in `src/pages/SettingsPage.tsx` using `@capacitor/filesystem` and `@capacitor/share`, because browser `Blob` download is not reliable inside a Capacitor Android WebView.
+- Added `@capacitor/filesystem@^7.0.0` and `@capacitor/share@^7.0.0` to dependencies.
+- Added `src/pages/SettingsPage.test.tsx` covering:
+  - Android-native export writes a JSON backup into `Directory.Cache`.
+  - Android-native export invokes the share sheet with the generated file URI.
+  - Valid backup import calls `replaceData`.
+  - Invalid backup JSON alerts and does not replace local data.
+- Fixed import file reading in `src/pages/SettingsPage.tsx` by adding `readFileText(file)`: use `file.text()` when available, otherwise fall back to `FileReader.readAsText`. This fixed a real compatibility issue exposed by jsdom and may also help older Android WebViews.
+- Fixed the new Settings test typing so `tsc -b` can compile the test file.
+- Removed `<uses-permission android:name="android.permission.INTERNET" />` from `android/app/src/main/AndroidManifest.xml` to match the offline/no-network requirement.
+
+Verification run in this session:
+
+```powershell
+npm.cmd test -- src/pages/SettingsPage.test.tsx
+npm.cmd test
+npm.cmd run build
+npm.cmd run cap:sync
+npx.cmd cap doctor android
+cd android
+.\gradlew.bat assembleDebug
+java -version
+```
+
+Observed results:
+
+- `npm.cmd test -- src/pages/SettingsPage.test.tsx` passed: 3 tests.
+- `npm.cmd test` passed: 13 files, 58 tests.
+- `npm.cmd run build` passed.
+- `npm.cmd run cap:sync` passed and found two Android plugins:
+  - `@capacitor/filesystem@7.0.0`
+  - `@capacitor/share@7.0.0`
+- `npx.cmd cap doctor android` exited successfully and reported Android looking good, but installed versions are mixed:
+  - `@capacitor/android: 7.6.4`
+  - `@capacitor/core: 7.6.4`
+  - `@capacitor/cli: 8.3.4`
+- `.\gradlew.bat assembleDebug` is blocked by local Java version, not by TypeScript/Vite:
+  - Current Java is OpenJDK 1.8.0_432.
+  - Android Gradle Plugin `com.android.tools.build:gradle:8.13.0` requires Java 11+.
+  - `com.google.gms:google-services:4.4.4` also requires Java 11+.
+- Build also still emits the known Vite warning that the main JS chunk is larger than 500 kB, likely from Recharts. This is a performance warning, not a build failure.
+
+Interrupted/incomplete work:
+
+- I attempted to align `@capacitor/cli` to the Capacitor 7 major version with `npm.cmd install -D @capacitor/cli@^7.0.0`.
+- The sandboxed attempt failed with npm `EACCES` while fetching from the registry.
+- The escalated retry was interrupted by the user before it completed.
+- As of this handoff, `package.json` still contains `@capacitor/cli: ^8.3.4`; do not assume the CLI was downgraded.
+
+Files that should not be committed:
+
+- `.claude/settings.json` is local agent config and should remain untracked.
 
 ## Execution Mode
 
@@ -141,11 +216,12 @@ Notes:
 
 ### Task 6: Entry Sheets And Forms
 
-Status: implemented, not yet reviewed.
+Status: complete and reviewed.
 
-Commit:
+Commits:
 
 - `b984ab5 feat: add entry sheets`
+- `c6f6698 fix: harden entry sheet interactions`
 
 Notes:
 
@@ -153,35 +229,83 @@ Notes:
 - Added `WeightEntrySheet`.
 - Added `InjectionEntrySheet`.
 - Added sheet/form CSS.
-- Implementer reported `npm.cmd run build` passed.
-- Implementer reported `npm.cmd test` passed with 39 tests.
-- Next session should start with Task 6 spec compliance review, then Task 6 code quality review. Do not move to Task 7 until both reviews pass and any Critical or Important issues are fixed.
+- Task 6 spec compliance review passed after accounting for the later docs-only commit.
+- Code quality review found focus management and pending-save close issues.
+- `c6f6698` fixed focus entry/trap/restore behavior, Escape handling, close-disabled behavior during pending saves, and added component tests.
+- `npm.cmd test` passed with 50 tests after Task 6 hardening.
+- `npm.cmd run build` passed.
+
+### Task 7: Home Page And Trend Chart
+
+Status: complete and reviewed.
+
+Commit:
+
+- `008ee89 feat: add home dashboard`
+
+Notes:
+
+- Added `TrendChart` using Recharts.
+- Added Home dashboard with latest weight, weight delta, quick entry buttons, trend chart, latest injection date, and days since latest injection.
+- Home opens `WeightEntrySheet` and `InjectionEntrySheet`.
+- Added Home and TrendChart tests.
+- Task 7 spec compliance review passed.
+- Task 7 code quality review passed with no Critical or Important findings.
+- `npm.cmd test` passed with 55 tests.
+- `npm.cmd run build` passed.
+- Non-blocker: Vite warns that the main JS chunk is about 653.89 kB minified, likely due to Recharts. Reviewer marked this as Minor and not blocking Task 8.
 
 ## Current Verification
 
-Last known verification:
+Fresh verification from the 2026-05-13 review session:
 
 ```powershell
+npm.cmd test -- src/pages/SettingsPage.test.tsx
 npm.cmd test
 npm.cmd run build
+npm.cmd run cap:sync
+npx.cmd cap doctor android
 ```
 
-Both passed after commit `b984ab5` according to the Task 6 implementer report.
+All commands above passed. `npm.cmd test` passed with 58 tests.
 
-Recommended baseline before continuing:
+Android debug APK build was attempted with:
 
 ```powershell
-npm.cmd test
-npm.cmd run build
+cd android
+.\gradlew.bat assembleDebug
 ```
+
+It failed because the machine is running Java 8. Install or switch to JDK 17, then rerun the Android build.
 
 ## Current Git State
 
-Expected `git status --short`:
+Observed `git status -sb` during the 2026-05-13 review:
 
 ```text
-?? docs/
+## master...origin/master [ahead 2]
+ M docs/superpowers/handoff/2026-05-12-weight-management-app-handoff.md
+ M package-lock.json
+ M package.json
+ M src/app/App.test.tsx
+ M src/pages/CalendarPage.tsx
+ M src/pages/RecordsPage.tsx
+ M src/pages/SettingsPage.tsx
+ M src/styles/global.css
+?? .claude/
+?? android/
+?? capacitor.config.ts
+?? docs/android-release.md
+?? src/components/MonthCalendar.tsx
+?? src/pages/SettingsPage.test.tsx
 ```
+
+The two unpushed commits are:
+
+- `c6f6698 fix: harden entry sheet interactions`
+- `008ee89 feat: add home dashboard`
+
+The modified/untracked files include later Task 8-10 work and the review fixes described above. They are not committed yet.
 
 There is also a recurring warning:
 
@@ -193,7 +317,43 @@ This warning has not blocked commits or builds.
 
 ## Full Execution Plan
 
-This section contains the whole build plan, including completed and remaining tasks. A new agent should continue with Task 6 review, but should understand the full destination before changing code.
+This section contains the whole build plan, including completed and remaining tasks. A new agent should continue with Task 8, but should understand the full destination before changing code.
+
+## Next Session Start Here
+
+Start by reviewing and committing the uncommitted Task 8-10 work plus the review fixes.
+
+Do not redo Task 6 or Task 7. They are complete and reviewed. Do not redo the Settings native export/import fix unless tests fail.
+
+Recommended first commands:
+
+```powershell
+git status -sb
+npm.cmd test
+npm.cmd run build
+npm.cmd run cap:sync
+```
+
+Then resolve the Android build environment:
+
+```powershell
+java -version
+```
+
+If Java is still 1.8, install or select JDK 17 before:
+
+```powershell
+cd android
+.\gradlew.bat assembleDebug
+```
+
+After the APK build is unblocked, run the remaining review:
+
+1. Spec compliance review for Task 8 Calendar, Task 9 Records/Settings, and Task 10 Android packaging.
+2. Code quality review for the same scope.
+3. Fix Critical and Important findings.
+4. Commit only intended files; do not commit `.claude/settings.json`.
+5. Push when the user asks.
 
 ### Task 1: Initialize Project
 
@@ -324,7 +484,7 @@ Commits:
 
 ### Task 5: Storage Service And App State
 
-Status: next task.
+Status: complete and reviewed.
 
 Files to create or modify:
 
@@ -367,6 +527,11 @@ git add src
 git commit -m "feat: add local app state"
 ```
 
+Actual commits:
+
+- `65bd2a6 feat: add local app state`
+- `70b0e36 fix: handle save errors without unmounting`
+
 ## Important Implementation Notes For Task 5
 
 - Use `npm.cmd`, not `npm`, in PowerShell. Plain `npm` hit execution policy problems earlier.
@@ -378,7 +543,7 @@ git commit -m "feat: add local app state"
 
 ### Task 6: Entry Sheets And Forms
 
-Status: pending.
+Status: complete and reviewed.
 
 Files to create or modify:
 
@@ -396,11 +561,13 @@ Required behavior:
 - Injection defaults medicine name to `Tirzepatide`.
 - Forms call passed `onSave` callbacks and close after successful save.
 - Add mobile-friendly sheet styling.
+- Later hardening added focus entry/trap/restore and disabled close while save is pending.
 
 Required verification:
 
 ```powershell
 npm.cmd run build
+npm.cmd test
 ```
 
 Expected commit:
@@ -410,9 +577,14 @@ git add src/components src/styles/global.css
 git commit -m "feat: add entry sheets"
 ```
 
+Actual commits:
+
+- `b984ab5 feat: add entry sheets`
+- `c6f6698 fix: harden entry sheet interactions`
+
 ### Task 7: Home Page And Trend Chart
 
-Status: pending.
+Status: complete and reviewed.
 
 Files to create or modify:
 
@@ -438,6 +610,7 @@ Required verification:
 
 ```powershell
 npm.cmd run build
+npm.cmd test
 ```
 
 Expected commit:
@@ -447,9 +620,19 @@ git add src/components/TrendChart.tsx src/pages/HomePage.tsx src/styles/global.c
 git commit -m "feat: add home dashboard"
 ```
 
+Actual commit:
+
+- `008ee89 feat: add home dashboard`
+
+Review notes:
+
+- Spec compliance passed.
+- Code quality passed with only Minor findings.
+- Non-blocker: Recharts currently contributes to a large initial JS chunk warning.
+
 ### Task 8: Calendar Page
 
-Status: pending.
+Status: implemented in working tree, not committed, still needs formal review.
 
 Files to create or modify:
 
@@ -484,7 +667,7 @@ git commit -m "feat: add calendar tracking view"
 
 ### Task 9: Records And Settings Pages
 
-Status: pending.
+Status: implemented in working tree, not committed, partially fixed during review, still needs formal review.
 
 Files to create or modify:
 
@@ -503,6 +686,8 @@ Required behavior:
 - Import must show a confirmation that same-date imported records overwrite local records.
 - Import success and failure should be visible to the user.
 - Settings page shows schema version and local-data warning.
+- Review fix added Android-native export through Capacitor Filesystem/Share.
+- Review fix added `FileReader` fallback for import compatibility.
 
 Required verification:
 
@@ -520,7 +705,7 @@ git commit -m "feat: add records and backup settings"
 
 ### Task 10: Capacitor Android Packaging
 
-Status: pending.
+Status: implemented in working tree, not committed, Android APK build blocked by local Java 8.
 
 Files to create or modify:
 
@@ -537,6 +722,7 @@ Required behavior:
   - `appName: 'Weight View'`
   - `webDir: 'dist'`
 - Add `@capacitor/cli` as a dev dependency.
+- Current `@capacitor/cli` is `^8.3.4` while `@capacitor/core` and `@capacitor/android` resolve to `7.6.4`. `cap doctor` passed, but aligning CLI to Capacitor 7 should still be considered for consistency.
 - Generate Android project with `npx cap add android`.
 - Sync web build into Android with `npm run cap:sync` or `npm.cmd run cap:sync`.
 - Document debug APK and release APK process.
@@ -558,6 +744,12 @@ npx.cmd cap sync android
 cd android
 .\gradlew assembleDebug
 ```
+
+Current verification status:
+
+- `npm.cmd run cap:sync` passes.
+- `.\gradlew.bat assembleDebug` fails until Java 11+ is available; prefer JDK 17.
+- `android/app/src/main/AndroidManifest.xml` has had the generated `INTERNET` permission removed to preserve the offline requirement.
 
 Expected APK:
 
@@ -657,3 +849,6 @@ For each remaining task:
 - npm reports one critical vulnerability during install. No package-level fix has been applied yet because it has not blocked local functionality.
 - Domain tests could later be expanded for timestamp preservation and additional invalid input coverage.
 - Release signing is not configured yet; it belongs to Task 10.
+- Vite warns that the main JS chunk is larger than 500 kB, likely due to Recharts. Consider lazy-loading the chart later.
+- Capacitor CLI is currently on major version 8 while core/android are on 7. `cap doctor` passed, but version alignment should be revisited.
+- Android debug APK cannot be produced on this machine until Java is upgraded from 8 to 11+; JDK 17 is the pragmatic target.

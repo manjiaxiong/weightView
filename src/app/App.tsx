@@ -12,7 +12,7 @@ export function App() {
   const [tab, setTab] = useState<AppTab>('home')
 
   if (appData.loadState === 'loading') {
-    return <main className="app-shell centered">Loading...</main>
+    return <main className="app-shell centered">加载中...</main>
   }
 
   if (appData.loadState === 'error') {

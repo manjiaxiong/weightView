@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { deleteInjectionRecord, upsertInjectionRecord } from '../domain/injection'
-import type { AppData, InjectionRecord, IsoDate, WeightRecord } from '../domain/types'
+import type { AppData, AppSettings, InjectionRecord, IsoDate, WeightRecord } from '../domain/types'
 import { deleteWeightRecord, upsertWeightRecord } from '../domain/weight'
 import { loadAppData, saveAppData } from '../services/storageService'
 
@@ -23,11 +23,12 @@ type AppDataActions = {
   removeWeight: (id: string) => Promise<void>
   saveInjection: (input: InjectionInput) => Promise<void>
   removeInjection: (id: string) => Promise<void>
+  saveSettings: (settings: Partial<AppSettings>) => Promise<void>
   replaceData: (nextData: AppData) => Promise<void>
 }
 
 function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Unable to load app data'
+  return error instanceof Error ? error.message : '无法加载数据'
 }
 
 export function useAppData() {
@@ -78,7 +79,7 @@ export function useAppData() {
     try {
       await persistTask
     } catch (persistError) {
-      setSaveError('Unable to save app data')
+      setSaveError('保存数据失败')
       throw persistError
     }
   }, [])
@@ -127,6 +128,14 @@ export function useAppData() {
           records: {
             ...current.records,
             injections: deleteInjectionRecord(current.records.injections, id)
+          }
+        })),
+      saveSettings: (settings) =>
+        updateData((current) => ({
+          ...current,
+          settings: {
+            ...current.settings,
+            ...settings
           }
         })),
       replaceData: persistNextData

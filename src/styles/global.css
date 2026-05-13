@@ -90,6 +90,7 @@ button {
 
 .hero-panel,
 .info-panel,
+.target-panel,
 .chart-panel {
   border: 1px solid #d9e2dc;
   border-radius: 8px;
@@ -115,6 +116,31 @@ button {
 .metric-value.secondary {
   color: #334e68;
   font-size: 28px;
+}
+
+.target-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.target-summary {
+  color: #334e68;
+  font-weight: 700;
+}
+
+.progress-track {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e6f1ec;
+}
+
+.progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #2f855a;
 }
 
 .quick-grid {
@@ -166,7 +192,7 @@ button {
 
 .segmented {
   display: inline-grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 4px;
   width: 100%;
   padding: 4px;
@@ -194,8 +220,8 @@ button {
 
 .chart-box {
   width: 100%;
-  height: 240px;
-  min-height: 240px;
+  height: 280px;
+  min-height: 280px;
 }
 
 .empty-chart {
@@ -381,6 +407,207 @@ button {
   font-size: 13px;
 }
 
+.secondary-button.compact {
+  min-height: 40px;
+  padding: 0 12px;
+}
+
+.month-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.weekday {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.calendar-day {
+  min-height: 58px;
+  min-width: 0;
+  border: 1px solid #d9e2dc;
+  border-radius: 8px;
+  padding: 5px 4px;
+  background: #ffffff;
+  color: #1f2933;
+  display: grid;
+  grid-auto-rows: min-content;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.calendar-day.muted {
+  opacity: 0.45;
+}
+
+.calendar-day-number {
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.calendar-day-markers {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.calendar-marker {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weight-marker {
+  color: #176b49;
+  font-size: 11px;
+}
+
+.injection-marker {
+  color: #7a4b00;
+  font-size: 10px;
+}
+
+.date-actions {
+  border: 1px solid #d9e2dc;
+  border-radius: 8px;
+  padding: 14px;
+  background: #ffffff;
+}
+
+.date-actions h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.record-list {
+  display: grid;
+  gap: 10px;
+}
+
+.record-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #d9e2dc;
+  border-radius: 8px;
+  padding: 14px;
+  background: #ffffff;
+}
+
+.record-row div {
+  display: grid;
+  gap: 4px;
+}
+
+.record-row span,
+.record-row time {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.record-meta {
+  justify-items: end;
+}
+
+.record-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.danger-button {
+  min-height: 34px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 0 10px;
+  background: #fff7f7;
+  color: #b42318;
+  font-weight: 800;
+}
+
+.empty-state {
+  display: grid;
+  min-height: 120px;
+  place-items: center;
+  border: 1px dashed #bdd0c5;
+  border-radius: 8px;
+  color: #64748b;
+}
+
+.settings-panel {
+  display: grid;
+  gap: 12px;
+  border: 1px solid #d9e2dc;
+  border-radius: 8px;
+  padding: 16px;
+  background: #ffffff;
+}
+
+.settings-panel h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.settings-panel p {
+  margin: 0;
+  color: #52616b;
+  line-height: 1.5;
+}
+
+.settings-form {
+  display: grid;
+  gap: 12px;
+}
+
+.settings-form label {
+  display: grid;
+  gap: 8px;
+  color: #334e68;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.settings-form input {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid #bcccdc;
+  border-radius: 8px;
+  color: #102a43;
+  background: #ffffff;
+}
+
+.settings-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.file-button {
+  display: grid;
+  min-height: 48px;
+  place-items: center;
+  border: 1px solid #bdd0c5;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #176b49;
+  font-weight: 800;
+}
+
+.file-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 @media (min-width: 760px) {
   .app-content {
     padding: 40px 32px 112px;
@@ -388,6 +615,7 @@ button {
 
   .hero-panel,
   .info-panel,
+  .target-panel,
   .quick-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

@@ -128,7 +128,7 @@ export function EntrySheet({ title, open, closeDisabled = false, onClose, childr
           <button
             className="icon-button"
             type="button"
-            aria-label="Close"
+            aria-label="关闭"
             disabled={closeDisabled}
             onClick={handleClose}
           >

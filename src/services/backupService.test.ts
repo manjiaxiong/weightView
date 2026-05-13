@@ -17,6 +17,14 @@ describe('backupService', () => {
     expect(merged.records.weights).toHaveLength(1)
   })
 
+  it('preserves imported target weight settings', () => {
+    const source = createEmptyAppData()
+    source.settings.targetWeight = 70
+    const json = JSON.stringify(buildExportPayload(source, '2026-05-12T00:00:00.000Z'))
+
+    expect(importBackupJson(createEmptyAppData(), json).settings.targetWeight).toBe(70)
+  })
+
   it('uses imported same-date records over local records', () => {
     const local = createEmptyAppData()
     local.records.weights.push({ id: 'local', date: '2026-05-12', weight: 81, createdAt: 'a', updatedAt: 'b' })
@@ -29,29 +37,29 @@ describe('backupService', () => {
   })
 
   it('rejects invalid JSON without returning partial data', () => {
-    expect(() => importBackupJson(createEmptyAppData(), '{bad json')).toThrow('Backup file is not valid JSON')
+    expect(() => importBackupJson(createEmptyAppData(), '{bad json')).toThrow('备份文件不是有效的 JSON')
   })
 
   it('rejects missing backup envelope data', () => {
-    expect(() => importBackupJson(createEmptyAppData(), '{}')).toThrow('Backup file is not a valid Weight View backup')
+    expect(() => importBackupJson(createEmptyAppData(), '{}')).toThrow('备份文件格式无效')
   })
 
   it('rejects null backup data', () => {
     expect(() => importBackupJson(createEmptyAppData(), '{ "data": null }')).toThrow(
-      'Backup file is not a valid Weight View backup'
+      '备份文件格式无效'
     )
   })
 
   it('rejects missing exportedAt backup metadata', () => {
     expect(() => importBackupJson(createEmptyAppData(), JSON.stringify({ data: createEmptyAppData() }))).toThrow(
-      'Backup file is not a valid Weight View backup'
+      '备份文件格式无效'
     )
   })
 
   it('rejects non-iso exportedAt backup metadata', () => {
     for (const exportedAt of ['not-a-date', '123', '2026-05-12', 'May 12, 2026']) {
       expect(() => importBackupJson(createEmptyAppData(), JSON.stringify({ exportedAt, data: createEmptyAppData() }))).toThrow(
-        'Backup file is not a valid Weight View backup'
+        '备份文件格式无效'
       )
     }
   })
@@ -59,7 +67,7 @@ describe('backupService', () => {
   it('rejects empty backup app data envelope', () => {
     const json = JSON.stringify({ exportedAt: '2026-05-12T00:00:00.000Z', data: {} })
 
-    expect(() => importBackupJson(createEmptyAppData(), json)).toThrow('Backup file is not a valid Weight View backup')
+    expect(() => importBackupJson(createEmptyAppData(), json)).toThrow('备份文件格式无效')
   })
 
   it('rejects invalid imported weight data without overwriting local records', () => {
@@ -77,7 +85,7 @@ describe('backupService', () => {
       }
     })
 
-    expect(() => importBackupJson(local, json)).toThrow('Backup contains invalid record data')
+    expect(() => importBackupJson(local, json)).toThrow('备份数据包含无效记录')
     expect(local.records.weights).toEqual([{ id: 'local', date: '2026-05-12', weight: 81, createdAt: 'a', updatedAt: 'b' }])
   })
 
@@ -94,6 +102,6 @@ describe('backupService', () => {
       }
     })
 
-    expect(() => importBackupJson(createEmptyAppData(), json)).toThrow('Backup contains invalid record data')
+    expect(() => importBackupJson(createEmptyAppData(), json)).toThrow('备份数据包含无效记录')
   })
 })

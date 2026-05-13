@@ -10,8 +10,8 @@ describe('InjectionEntrySheet', () => {
     const onSave = vi.fn()
     render(<InjectionEntrySheet open initialDate="2026-05-13" onClose={vi.fn()} onSave={onSave} />)
 
-    fireEvent.change(screen.getByLabelText('Medicine name'), { target: { value: '   ' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Save injection' }))
+    fireEvent.change(screen.getByLabelText('药品名称'), { target: { value: '   ' } })
+    fireEvent.click(screen.getByRole('button', { name: '保存注射记录' }))
 
     await waitFor(() =>
       expect(onSave).toHaveBeenCalledWith({
@@ -52,16 +52,16 @@ describe('InjectionEntrySheet', () => {
 
     render(<Harness />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Save injection' }))
+    fireEvent.click(screen.getByRole('button', { name: '保存注射记录' }))
     expect(await screen.findByRole('alert')).toBeVisible()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    fireEvent.click(screen.getByRole('button', { name: '关闭' }))
     fireEvent.click(screen.getByRole('button', { name: 'Reopen' }))
 
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-    expect(screen.getByLabelText('Date')).toHaveValue('2026-05-14')
-    expect(screen.getByLabelText('Medicine name')).toHaveValue(DEFAULT_MEDICINE_NAME)
-    expect(screen.getByLabelText('Dose')).toHaveValue('')
+    expect(screen.getByLabelText('日期')).toHaveValue('2026-05-14')
+    expect(screen.getByLabelText('药品名称')).toHaveValue(DEFAULT_MEDICINE_NAME)
+    expect(screen.getByLabelText('剂量')).toHaveValue('')
   })
 
   it('keeps the sheet open and shows an inline error when async save fails', async () => {
@@ -72,10 +72,10 @@ describe('InjectionEntrySheet', () => {
 
     render(<InjectionEntrySheet open initialDate="2026-05-13" onClose={onClose} onSave={onSave} />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Save injection' }))
+    fireEvent.click(screen.getByRole('button', { name: '保存注射记录' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Injection service rejected the entry.')
-    expect(screen.getByRole('dialog', { name: 'Add injection' })).toBeVisible()
+    expect(screen.getByRole('dialog', { name: '添加注射' })).toBeVisible()
     expect(onClose).not.toHaveBeenCalled()
   })
 
@@ -91,11 +91,11 @@ describe('InjectionEntrySheet', () => {
 
     render(<InjectionEntrySheet open initialDate="2026-05-13" onClose={onClose} onSave={onSave} />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Save injection' }))
+    fireEvent.click(screen.getByRole('button', { name: '保存注射记录' }))
 
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Close' })).toBeDisabled())
+    await waitFor(() => expect(screen.getByRole('button', { name: '关闭' })).toBeDisabled())
 
-    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    fireEvent.click(screen.getByRole('button', { name: '关闭' }))
     fireEvent.click(screen.getByRole('presentation'))
     fireEvent.keyDown(document, { key: 'Escape' })
 

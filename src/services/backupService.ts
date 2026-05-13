@@ -26,11 +26,11 @@ export function importBackupJson(current: AppData, json: string): AppData {
   try {
     parsed = JSON.parse(json)
   } catch {
-    throw new Error('Backup file is not valid JSON')
+    throw new Error('备份文件不是有效的 JSON')
   }
 
   if (!isValidBackupPayload(parsed)) {
-    throw new Error('Backup file is not a valid Weight View backup')
+    throw new Error('备份文件格式无效')
   }
 
   const imported = migrateAppData(parsed.data, { strictRecords: true })

@@ -21,7 +21,7 @@ export function sortWeightRecords(records: WeightRecord[]): WeightRecord[] {
 export function upsertWeightRecord(records: WeightRecord[], input: WeightInput): WeightRecord[] {
   const date = normalizeIsoDate(input.date)
   if (!Number.isFinite(input.weight) || input.weight <= 0) {
-    throw new Error('Weight must be a positive number')
+    throw new Error('体重必须为正数')
   }
 
   const existing = records.find((record) => record.date === date)
@@ -47,4 +47,13 @@ export function getWeightDelta(records: WeightRecord[]): number | undefined {
     return undefined
   }
   return sorted[0].weight - sorted[1].weight
+}
+
+export function getInitialWeightDelta(records: WeightRecord[]): number | undefined {
+  const sorted = sortWeightRecords(records)
+  if (sorted.length < 2) {
+    return undefined
+  }
+
+  return sorted[0].weight - sorted[sorted.length - 1].weight
 }

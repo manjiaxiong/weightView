@@ -24,6 +24,7 @@ export type InjectionRecord = {
 export type AppSettings = {
   unit: 'kg'
   defaultMedicineName: string
+  targetWeight?: number
 }
 
 export type AppData = {

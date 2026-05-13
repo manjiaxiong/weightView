@@ -51,7 +51,7 @@ describe('useAppData', () => {
 
     expect(caught).toBeInstanceOf(Error)
     expect(result.current.loadState).toBe('ready')
-    expect(result.current.saveError).toBe('Unable to save app data')
+    expect(result.current.saveError).toBe('保存数据失败')
     expect(result.current.weights).toHaveLength(1)
   })
 
@@ -68,6 +68,19 @@ describe('useAppData', () => {
     expect(storageMocks.saveAppData.mock.calls[0][0].records.weights).toMatchObject([
       { date: '2026-05-12', weight: 80 }
     ])
+  })
+
+  it('persists settings updates to storage', async () => {
+    const { result } = renderHook(() => useAppData())
+
+    await waitFor(() => expect(result.current.loadState).toBe('ready'))
+
+    await act(async () => {
+      await result.current.actions.saveSettings({ targetWeight: 70 })
+    })
+
+    expect(storageMocks.saveAppData).toHaveBeenCalledTimes(1)
+    expect(storageMocks.saveAppData.mock.calls[0][0].settings.targetWeight).toBe(70)
   })
 
   it('queues rapid writes and persists the final intended state', async () => {

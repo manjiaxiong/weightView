@@ -28,9 +28,9 @@ describe('EntrySheet', () => {
     openButton.focus()
     fireEvent.click(openButton)
 
-    expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus()
+    expect(screen.getByRole('button', { name: '关闭' })).toHaveFocus()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    fireEvent.click(screen.getByRole('button', { name: '关闭' }))
 
     expect(openButton).toHaveFocus()
   })
@@ -43,7 +43,7 @@ describe('EntrySheet', () => {
       </EntrySheet>
     )
 
-    const closeButton = screen.getByRole('button', { name: 'Close' })
+    const closeButton = screen.getByRole('button', { name: '关闭' })
     const firstAction = screen.getByRole('button', { name: 'First action' })
     const lastAction = screen.getByRole('button', { name: 'Last action' })
 
@@ -68,7 +68,7 @@ describe('EntrySheet', () => {
       </EntrySheet>
     )
 
-    const closeButton = screen.getByRole('button', { name: 'Close' })
+    const closeButton = screen.getByRole('button', { name: '关闭' })
     expect(closeButton).toBeDisabled()
 
     fireEvent.click(closeButton)

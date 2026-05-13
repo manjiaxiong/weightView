@@ -2,7 +2,7 @@ import { addDays, differenceInCalendarDays, endOfMonth, format, isValid, parseIS
 import type { CalendarDay, IsoDate } from './types'
 
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
-const INVALID_ISO_DATE_ERROR = 'Expected a valid date in YYYY-MM-DD format'
+const INVALID_ISO_DATE_ERROR = '请输入有效的日期，格式为 YYYY-MM-DD'
 
 export function normalizeIsoDate(value: Date | string): IsoDate {
   if (value instanceof Date) {

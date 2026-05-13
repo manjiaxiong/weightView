@@ -57,7 +57,7 @@ export function InjectionEntrySheet({ open, record, initialDate, onClose, onSave
       })
       onClose()
     } catch (saveError) {
-      setError(getErrorMessage(saveError, 'Unable to save injection.'))
+      setError(getErrorMessage(saveError, '保存注射记录失败'))
     } finally {
       setIsSaving(false)
     }
@@ -65,19 +65,19 @@ export function InjectionEntrySheet({ open, record, initialDate, onClose, onSave
 
   return (
     <EntrySheet
-      title={record ? 'Edit injection' : 'Add injection'}
+      title={record ? '编辑注射' : '添加注射'}
       open={open}
       closeDisabled={isSaving}
       onClose={onClose}
     >
       <form className="sheet-form" onSubmit={handleSubmit}>
         <label>
-          Date
+          日期
           <input type="date" value={date} required onChange={(event) => setDate(event.target.value)} />
         </label>
 
         <label>
-          Medicine name
+          药品名称
           <input
             type="text"
             value={medicineName}
@@ -88,12 +88,12 @@ export function InjectionEntrySheet({ open, record, initialDate, onClose, onSave
         </label>
 
         <label>
-          Dose
+          剂量
           <input
             type="text"
             value={dose}
             aria-describedby={error ? errorId : undefined}
-            placeholder="Optional"
+            placeholder="选填"
             onChange={(event) => setDose(event.target.value)}
           />
         </label>
@@ -105,7 +105,7 @@ export function InjectionEntrySheet({ open, record, initialDate, onClose, onSave
         )}
 
         <button className="primary-button" type="submit" disabled={isSaving}>
-          {isSaving ? 'Saving...' : 'Save injection'}
+          {isSaving ? '保存中...' : '保存注射记录'}
         </button>
       </form>
     </EntrySheet>

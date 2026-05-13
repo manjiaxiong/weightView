@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { WeightRecord } from './types'
-import { deleteWeightRecord, getLatestWeight, getWeightDelta, upsertWeightRecord } from './weight'
+import { deleteWeightRecord, getInitialWeightDelta, getLatestWeight, getWeightDelta, upsertWeightRecord } from './weight'
 
 const baseRecords: WeightRecord[] = [
   { id: 'w1', date: '2026-05-10', weight: 80.2, createdAt: '2026-05-10T08:00:00.000Z', updatedAt: '2026-05-10T08:00:00.000Z' },
@@ -27,5 +27,16 @@ describe('weight domain', () => {
   it('returns latest weight and delta from previous record', () => {
     expect(getLatestWeight(baseRecords)?.weight).toBe(79.6)
     expect(getWeightDelta(baseRecords)).toBeCloseTo(-0.6)
+  })
+
+  it('returns the latest weight delta from the initial record', () => {
+    expect(getInitialWeightDelta(baseRecords)).toBeCloseTo(-0.6)
+    expect(
+      getInitialWeightDelta([
+        { ...baseRecords[1], date: '2026-05-12', weight: 79.6 },
+        { ...baseRecords[0], date: '2026-05-01', weight: 82.4 },
+        { ...baseRecords[0], id: 'w3', date: '2026-05-08', weight: 81.1 }
+      ])
+    ).toBeCloseTo(-2.8)
   })
 })
